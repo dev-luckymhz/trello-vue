@@ -1,7 +1,7 @@
 <template>
   <div class="min-w-full min-h-screen h-screen overflow-hidden bg-blue-100">
   <Header/>
-  <div class="flex mt-3 mx-4 space-x-4">
+  <div class="flex mt-3 mx-4 min-w-full mx-4 space-x-4">
     <div v-for="column in columns" :key="column.title" class="flex flex-col bg-blue-400 p-4 rounded-lg">
       <h2 class="text-lg font-bold mb-4">{{ column.title }}</h2>
       <div class="flex flex-col space-y-4">
@@ -14,6 +14,7 @@
             group="task"
             @start="drag=true"
             @end="drag=false"
+            @toggle-delete = "deleteTask(column, task)"
         ></task-card>
             <button  slot="footer" class="mt-4 py-2 px-4 bg-green-300 text-white rounded-md hover:bg-blue-700" @click="addTask(column)" >Add Task</button>
         </draggable>
@@ -29,6 +30,9 @@ import Header from "./components/header.vue";
 import TaskCard from "./components/TaskCard.vue";
 export default {
   name: "App",
+  created () {
+      document.title = 'Kanban Page'
+  },
   components: {
     TaskCard,
     Header,
@@ -99,7 +103,8 @@ export default {
         id: Date.now(), // Generate a unique ID for the new task
         title: "New Task",
         date: "",
-        type: ""
+        type: "",
+        url: "https://randomuser.me/api/portraits/men/75.jpg"
       };
       this.$swal.fire({
         title: 'Create a task',
@@ -132,6 +137,11 @@ export default {
           newTask.type = result.value[2];
           console.log(newTask)
           column.tasks.push(newTask);
+          this.$swal.fire(
+              'created!',
+              'The Task was Created.',
+              'success'
+          )
         }
       })
       // const newTitle = prompt("Enter the new task title:", newTask.title);
@@ -139,6 +149,31 @@ export default {
         newTask.title = newTitle;
       column.tasks.push(newTask);
       }
+    },
+    deleteTask(column, task) {
+      // Implement the logic to delete a task
+      this.$swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const index = column.tasks.indexOf(task);
+          if (index !== -1) {
+            column.tasks.splice(index, 1);
+          }
+          this.$swal.fire(
+              'Deleted!',
+              'Your file has been deleted.',
+              'success'
+          )
+        }
+      })
+
     }
   }
 };

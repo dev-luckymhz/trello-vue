@@ -7,11 +7,14 @@
     </div>
     <div class="flex mt-4 justify-between items-center">
       <span class="text-sm text-gray-600">{{ task.date }}</span>
+      <div class="flex flex-row">
+      <font-awesome-icon icon="fa-solid fa-trash" class="text-sm text-red-300 hover:text-red-700" @click="toggleDelete" />
+      <font-awesome-icon icon="fa-solid fa-pencil" class="text-sm text-green-300 mx-2 hover:text-red-700"  @click="editTask(task)" />
+      </div>
       <badge v-if="task.type" :color="badgeColor">{{ task.type }}</badge>
     </div>
     <div class="flex justify-end mt-4">
 
-      <button class="text-sm text-red-500 hover:text-red-700" @click="deleteTask(task)">Delete</button>
     </div>
   </div>
 </template>
@@ -73,37 +76,16 @@ export default {
           task.title = result.value[0];
           task.date = result.value[1];
           task.type = result.value[2];
-        }
-      })
-      // const newTitle = prompt("Enter the new task title:", task.title);
-      // if (newTitle) {
-      //   task.title = newTitle;
-      // }
-    },
-    deleteTask(column, task) {
-      // Implement the logic to delete a task
-      this.$swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const index = column.tasks.indexOf(task);
-          if (index !== -1) {
-            column.tasks.splice(index, 1);
-          }
           this.$swal.fire(
-              'Deleted!',
-              'Your file has been deleted.',
+              'Updated!',
+              'The Task was updated.',
               'success'
           )
         }
       })
-
+    },
+    toggleDelete() {
+      this.$emit('toggle-delete');
     }
   }
 };
