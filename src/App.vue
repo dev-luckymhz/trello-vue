@@ -1,35 +1,39 @@
 <template>
-  <div class="task-board">
-    <div v-for="column in columns" :key="column.title" class="column">
-      <h2 class="text-xl font-bold mb-4">{{ column.title }}</h2>
-      <table class="w-full border border-gray-300 mb-4">
-        <thead>
-        <tr>
-          <th class="py-2 px-4 border-b border-gray-300">Task</th>
-          <th class="py-2 px-4 border-b border-gray-300">Date</th>
-          <th class="py-2 px-4 border-b border-gray-300">Type</th>
-          <th class="py-2 px-4 border-b border-gray-300"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="task in column.tasks" :key="task.id">
-          <td class="py-2 px-4 border-b border-gray-300">{{ task.title }}</td>
-          <td class="py-2 px-4 border-b border-gray-300">{{ task.date }}</td>
-          <td class="py-2 px-4 border-b border-gray-300">{{ task.type }}</td>
-          <td class="py-2 px-4 border-b border-gray-300">
-            <button @click="editTask(column, task)" class="mr-2 text-blue-500">Edit</button>
-            <button @click="deleteTask(column, task)" class="text-red-500">Delete</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <button @click="addTask(column)" class="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600">Add Task</button>
+  <div class="min-w-full min-h-screen h-screen overflow-hidden bg-blue-100">
+  <Header/>
+  <div class="flex mt-3 mx-4 space-x-4">
+    <div v-for="column in columns" :key="column.title" class="flex flex-col bg-blue-400 p-4 rounded-lg">
+      <h2 class="text-lg font-bold mb-4">{{ column.title }}</h2>
+      <div class="flex flex-col space-y-4">
+        <draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
+        <task-card
+            v-for="(task) in column.tasks"
+            :key="task.id"
+            :task="task"
+            class="mt-3 cursor-move"
+            group="task"
+            @start="drag=true"
+            @end="drag=false"
+        ></task-card>
+            <button  slot="footer" class="mt-4 py-2 px-4 bg-green-300 text-white rounded-md hover:bg-blue-700" @click="addTask(column)" >Add Task</button>
+        </draggable>
+      </div>
     </div>
+  </div>
   </div>
 </template>
 
 <script>
+import { VueDraggableNext } from 'vue-draggable-next';
+import Header from "./components/header.vue";
+import TaskCard from "./components/TaskCard.vue";
 export default {
+  name: "App",
+  components: {
+    TaskCard,
+    Header,
+    draggable : VueDraggableNext
+  },
   data() {
     return {
       columns: [
@@ -37,33 +41,17 @@ export default {
           title: "Backlog",
           tasks: [
             {
-              id: 1,
+              id: 654654,
               title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
+              date: "2023-06-22",
+              type: "Feature Request",
+              url:"https://randomuser.me/api/portraits/men/75.jpg"
             },
             {
-              id: 2,
+              id: 145687,
               title: "Provide documentation on integrations",
-              date: "Sep 12"
-            },
-            {
-              id: 3,
-              title: "Design shopping cart dropdown",
-              date: "Sep 9",
-              type: "Design"
-            },
-            {
-              id: 4,
-              title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
-            },
-            {
-              id: 5,
-              title: "Test checkout flow",
-              date: "Sep 15",
-              type: "QA"
+              date: "2023-07-53",
+              url:"https://randomuser.me/api/portraits/men/76.jpg"
             }
           ]
         },
@@ -71,22 +59,11 @@ export default {
           title: "In Progress",
           tasks: [
             {
-              id: 6,
+              id: 646545,
               title: "Design shopping cart dropdown",
-              date: "Sep 9",
-              type: "Design"
-            },
-            {
-              id: 7,
-              title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
-            },
-            {
-              id: 8,
-              title: "Provide documentation on integrations",
-              date: "Sep 12",
-              type: "Backend"
+              date: "2023-01-25",
+              type: "Design",
+              url:"https://randomuser.me/api/portraits/men/76.jpg"
             }
           ]
         },
@@ -94,57 +71,23 @@ export default {
           title: "Review",
           tasks: [
             {
-              id: 9,
+              id: 956746,
               title: "Provide documentation on integrations",
-              date: "Sep 12"
+              date: "2023-06-18",
+              url:"https://randomuser.me/api/portraits/men/75.jpg"
             },
-            {
-              id: 10,
-              title: "Design shopping cart dropdown",
-              date: "Sep 9",
-              type: "Design"
-            },
-            {
-              id: 11,
-              title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
-            },
-            {
-              id: 12,
-              title: "Design shopping cart dropdown",
-              date: "Sep 9",
-              type: "Design"
-            },
-            {
-              id: 13,
-              title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
-            }
           ]
         },
         {
           title: "Done",
           tasks: [
             {
-              id: 14,
+              id: 456546,
               title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
+              date: "2023-06-27",
+              type: "Feature Request",
+              url:"https://randomuser.me/api/portraits/men/78.jpg"
             },
-            {
-              id: 15,
-              title: "Design shopping cart dropdown",
-              date: "Sep 9",
-              type: "Design"
-            },
-            {
-              id: 16,
-              title: "Add discount code to checkout page",
-              date: "Sep 14",
-              type: "Feature Request"
-            }
           ]
         }
       ]
@@ -159,17 +102,35 @@ export default {
         type: ""
       };
       this.$swal.fire({
-        title: 'Creer Un',
-        input: 'text',
-        inputAttributes: {
-          autocapitalize: 'off'
-        },
+        title: 'Create a task',
         showCancelButton: true,
         confirmButtonText: 'Save Task',
         showLoaderOnConfirm: true,
+        width: 600,
+        html:
+            '<input id="title-input" type="text" class="swal2-input" placeholder="enter Task Title">' +
+            '<input id="date-input" type="date" class="swal2-input ">'+
+            '<select id="type-input" class="swal2-input shadow"> ' +
+            ' <option value="design">choose a type</option>' +
+            ' <option value="design">Design</option>' +
+            ' <option value="QA">Q&A</option>' +
+            ' <option value="Feature Request">Feature Request</option>' +
+            '</select>',
+        preConfirm: function () {
+          return new Promise(function (resolve) {
+            resolve([
+              document.getElementById("title-input").value,
+              document.getElementById("date-input").value,
+              document.getElementById("type-input").value,
+            ])
+          })
+        },
       }).then((result) => {
         if (result) {
-          newTask.title = result.value;
+          newTask.title = result.value[0];
+          newTask.date = result.value[1];
+          newTask.type = result.value[2];
+          console.log(newTask)
           column.tasks.push(newTask);
         }
       })
@@ -178,38 +139,6 @@ export default {
         newTask.title = newTitle;
       column.tasks.push(newTask);
       }
-    },
-    editTask(column, task) {
-      // Implement the logic to edit a task
-      const newTitle = prompt("Enter the new task title:", task.title);
-      if (newTitle) {
-        task.title = newTitle;
-      }
-    },
-    deleteTask(column, task) {
-      // Implement the logic to delete a task
-      this.$swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const index = column.tasks.indexOf(task);
-          if (index !== -1) {
-            column.tasks.splice(index, 1);
-          }
-          this.$swal.fire(
-              'Deleted!',
-              'Your file has been deleted.',
-              'success'
-          )
-        }
-      })
-
     }
   }
 };
