@@ -81,16 +81,6 @@ ul {
 li {
   margin-bottom: 10px;
 }
-
-li::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #007bff;
-  margin-right: 10px;
-}
 .table {
   width: 100%;
   margin-bottom: 1rem;
