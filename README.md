@@ -72,53 +72,6 @@ Feel free to customize the app by modifying the code in the src directory.
 ## contributing
 <p> Contributions are welcome! If you have any suggestions, bug fixes, or new features to propose, please follow the steps below: </p>
 
-<style>
-ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-li {
-  margin-bottom: 10px;
-}
-.table {
-  width: 100%;
-  margin-bottom: 1rem;
-  color: #212529;
-  border-collapse: collapse;
-}
-.table th,
-.table td {
-  padding: 0.75rem;
-  vertical-align: top;
-  border-top: 1px solid #dee2e6;
-}
-.table thead th {
-  vertical-align: bottom;
-  border-bottom: 2px solid #dee2e6;
-}
-.table tbody + tbody {
-  border-top: 2px solid #dee2e6;
-}
-.table-sm th,
-.table-sm td {
-  padding: 0.3rem;
-}
-.table-bordered {
-  border: 1px solid #dee2e6;
-}
-.table-bordered th,
-.table-bordered td {
-  border: 1px solid #dee2e6;
-}
-.table-bordered thead th,
-.table-bordered thead td {
-  border-bottom-width: 2px;
-}
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-</style>
 <ul>
   <li>Fork the repository.</li>
   <li>Create a new branch for your feature or bug fix.</li>
@@ -129,7 +82,6 @@ li {
 
 
 ## Author
-
 
 <table class="table table-bordered table-striped">
   <thead>
