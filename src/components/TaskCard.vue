@@ -8,8 +8,8 @@
     <div class="flex mt-4 justify-between items-center">
       <span class="text-sm text-gray-600">{{ task.date }}</span>
       <div class="flex flex-row">
-      <font-awesome-icon icon="fa-solid fa-trash" class="text-sm text-red-300 hover:text-red-700" @click="toggleDelete" />
-      <font-awesome-icon icon="fa-solid fa-pencil" class="text-sm text-green-300 mx-2 hover:text-red-700"  @click="editTask(task)" />
+      <font-awesome-icon icon="fa-solid fa-trash"  class="text-sm text-red-300 hover:text-red-500 cursor-pointer" @click="toggleDelete" />
+      <font-awesome-icon icon="fa-solid fa-pencil" class="text-sm text-green-300 mx-2 hover:text-green-500 cursor-pointer"  @click="editTask(task)" />
       </div>
       <badge v-if="task.type" :color="badgeColor">{{ task.type }}</badge>
     </div>

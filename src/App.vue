@@ -2,8 +2,13 @@
   <div class="min-w-full min-h-screen h-screen overflow-hidden bg-blue-100">
   <Header/>
   <div class="flex mt-3 mx-4 min-w-full mx-4 space-x-4">
-    <div v-for="column in columns" :key="column.title" class="flex flex-col bg-blue-400 p-4 rounded-lg">
-      <h2 class="text-lg font-bold mb-4">{{ column.title }}</h2>
+    <div v-for="column in columns" :key="column.title" class="flex flex-col min-w-[300px] relative bg-gray-100  p-4 shadow overflow-hidden rounded-lg">
+      <h4 className=" p-3 flex justify-between items-center mb-2">
+              <span className="text-2xl text-gray-600">
+                {{ column.title }}
+              </span>
+        <font-awesome-icon icon="fa-solid fa-ellipsis-v" className="w-5 h-5 text-gray-500" />
+      </h4>
       <div class="flex flex-col space-y-4">
         <draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
         <task-card
@@ -16,9 +21,15 @@
             @end="drag=false"
             @toggle-delete = "deleteTask(column, task)"
         ></task-card>
-            <button  slot="footer" class="mt-4 py-2 px-4 bg-green-300 text-white rounded-md hover:bg-blue-700" @click="addTask(column)" >Add Task</button>
         </draggable>
       </div>
+      <button
+          className="flex justify-center items-center my-3 space-x-2 text-lg"
+          @click="addTask(column)"
+      >
+      <span>Add task</span>
+      <font-awesome-icon icon="fa-solid fa-plus" className="w-5 h-5 text-gray-500" />
+      </button>
     </div>
   </div>
   </div>
