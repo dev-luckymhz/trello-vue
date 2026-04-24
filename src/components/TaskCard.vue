@@ -1,92 +1,113 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Priority, Task } from '@/types'
+
+const props = defineProps<{
+  task: Task
+  priorities?: Priority[]
+  readonly?: boolean
+  canEdit?: boolean
+  canDelete?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit', task: Task): void
+  (e: 'delete', taskId: string): void
+}>()
+
+const { t, locale } = useI18n()
+
+function formattedDate(date: string | null): string {
+  if (!date) return ''
+  const d = new Date(date)
+  if (Number.isNaN(d.getTime())) return date
+  return d.toLocaleDateString(locale.value, { month: 'short', day: 'numeric' })
+}
+
+const priority = computed<Priority | null>(() => {
+  if (!props.task.priorityId) return null
+  return props.priorities?.find((p) => p.id === props.task.priorityId) ?? null
+})
+
+const priorityLabel = computed(() => {
+  if (priority.value) return priority.value.name
+  const v = props.task.importance
+  return v.charAt(0) + v.slice(1).toLowerCase()
+})
+
+const priorityStyle = computed(() => {
+  const color = priority.value?.color ?? fallbackColor(props.task.importance)
+  return {
+    backgroundColor: `${color}20`,
+    color,
+    borderColor: `${color}40`,
+  }
+})
+
+function fallbackColor(importance: string): string {
+  switch (importance) {
+    case 'URGENT':
+      return '#ea580c'
+    case 'HIGH':
+      return '#d97706'
+    case 'MEDIUM':
+      return '#2563eb'
+    case 'LOW':
+      return '#64748b'
+    default:
+      return '#64748b'
+  }
+}
+</script>
+
 <template>
-  <div class="bg-white shadow rounded px-3 pt-3 pb-5 min-w-[300px] border border-white">
-    <div class="flex justify-between">
-      <p class="text-gray-700 font-semibold font-sans tracking-wide text-sm">{{ task.title }}</p>
-
-      <img class="w-6 h-6 rounded-full ml-3" :src="task.url" alt="Avatar">
-    </div>
-    <div class="flex mt-4 justify-between items-center">
-      <span class="text-sm text-gray-600">{{ task.date }}</span>
-      <div class="flex flex-row">
-      <font-awesome-icon icon="fa-solid fa-trash"  class="text-sm text-red-300 hover:text-red-500 cursor-pointer" @click="toggleDelete" />
-      <font-awesome-icon icon="fa-solid fa-pencil" class="text-sm text-green-300 mx-2 hover:text-green-500 cursor-pointer"  @click="editTask(task)" />
+  <div
+    class="group bg-white dark:bg-slate-900 rounded-xl border divider p-3 shadow-sm hover:shadow-md hover:border-brand-200 dark:hover:border-brand-600 transition"
+    :class="readonly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'"
+    @dblclick="!readonly && canEdit && emit('edit', task)"
+  >
+    <div class="flex items-start justify-between gap-2">
+      <p class="text-sm font-semibold text-app leading-snug">{{ task.title }}</p>
+      <div
+        v-if="canEdit || canDelete"
+        class="flex items-center opacity-0 group-hover:opacity-100 transition shrink-0"
+      >
+        <button
+          v-if="canEdit"
+          class="text-subtle hover:text-brand-600 dark:hover:text-brand-400 p-1 rounded"
+          @click.stop="emit('edit', task)"
+          :aria-label="t('common.edit')"
+        >
+          <font-awesome-icon icon="fa-solid fa-pencil" class="w-3.5 h-3.5" />
+        </button>
+        <button
+          v-if="canDelete"
+          class="text-subtle hover:text-red-500 p-1 rounded"
+          @click.stop="emit('delete', task.id)"
+          :aria-label="t('common.delete')"
+        >
+          <font-awesome-icon icon="fa-solid fa-trash" class="w-3.5 h-3.5" />
+        </button>
       </div>
-      <badge v-if="task.type" :color="badgeColor">{{ task.type }}</badge>
     </div>
-    <div class="flex justify-end mt-4">
 
+    <p
+      v-if="task.description"
+      class="mt-1.5 text-xs text-muted line-clamp-2 leading-relaxed"
+    >
+      {{ task.description }}
+    </p>
+
+    <div class="flex items-center justify-between mt-3 gap-2 flex-wrap">
+      <span
+        class="inline-flex items-center gap-1.5 px-2 h-6 rounded-full text-[11px] font-semibold border"
+        :style="priorityStyle"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-current opacity-70"></span>
+        {{ priorityLabel }}
+      </span>
+      <span v-if="task.dueDate" class="text-xs text-subtle">{{ formattedDate(task.dueDate) }}</span>
     </div>
   </div>
 </template>
-
-<script>
-import Badge from "./Badge.vue";
-export default {
-  components: {
-    Badge
-  },
-  props: {
-    task: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  computed: {
-    badgeColor() {
-      const mappings = {
-        Design: "purple",
-        "Feature Request": "teal",
-        Backend: "blue",
-        QA: "green",
-        default: "teal"
-      };
-      return mappings[this.task.type] || mappings.default;
-    }
-  },
-  methods : {
-    editTask(task) {
-      // Implement the logic to edit a task
-      // alert(task.date)
-      this.$swal.fire({
-        title: 'Create a task',
-        showCancelButton: true,
-        confirmButtonText: 'Save Task',
-        showLoaderOnConfirm: true,
-        width: 600,
-        html:
-            '<input id="title-input" type="text" value="'+task.title+'" class="swal2-input" placeholder="enter Task Title">' +
-            '<input id="date-input" type="date" value="'+task.date+'" class="swal2-input ">'+
-            '<select id="type-input" class="swal2-input shadow">'+
-            ' <option value="'+task.type+'">choose a type</option>'+
-            ' <option value="design">Design</option>' +
-            ' <option value="QA">Q&A</option>' +
-            ' <option value="Feature Request">Feature Request</option>' +
-            '</select>',
-        preConfirm: function () {
-          return new Promise(function (resolve) {
-            resolve([
-              document.getElementById("title-input").value,
-              document.getElementById("date-input").value,
-              document.getElementById("type-input").value,
-            ])
-          })
-        },
-      }).then((result) => {
-        if (result) {
-          task.title = result.value[0];
-          task.date = result.value[1];
-          task.type = result.value[2];
-          this.$swal.fire(
-              'Updated!',
-              'The Task was updated.',
-              'success'
-          )
-        }
-      })
-    },
-    toggleDelete() {
-      this.$emit('toggle-delete');
-    }
-  }
-};
-</script>

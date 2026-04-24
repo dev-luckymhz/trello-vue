@@ -1,103 +1,87 @@
-# Trello Clone
+# Kanban Board — Frontend
 
-This is a simple Trello clone built with Vue 3 and Vite. It provides a basic Kanban board interface for managing tasks and allows you to create, edit, and delete tasks in different columns using drag and drop functionality.
-
-<img src="./public/capture/c.png" alt="Alt Text" width="800" height="500"/>
-
-## Demo
-
-A live demo of the app can be found [here](https://example.com).
-
-## Table of Contents
-
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Author](#author)
+A modern Trello-style Kanban UI built with **Vue 3**, **TypeScript**, **Pinia**, **Vue Router**, and **Tailwind CSS v4**. It talks to the companion [trello-back](../trello-back) Express + TypeORM + MySQL API over HTTP.
 
 ## Features
 
-- Drag and drop functionality for task management.
-- Add, edit, and delete tasks in different columns.
-- Responsive design for optimal viewing on different devices.
-- Simple and intuitive user interface.
+- Authentication (register / login / logout) with JWT
+- Multiple projects per user (personal or owned by an organization)
+- Organizations (list, create, delete)
+- Dynamic task statuses (columns) per project — add, rename, reorder, delete
+- Task CRUD with **title, description, due date, importance** (`URGENT / HIGH / MEDIUM / LOW`)
+- Drag & drop for tasks (between/within columns) and columns themselves, with server-side persistence
+- Typed HTTP client (axios) with auth token interceptor + auto-logout on 401
 
-## Prerequisites
+## Tech stack
 
-Before running the app, ensure that you have the following dependencies installed on your machine:
+| Layer         | Choice                                    |
+| ------------- | ----------------------------------------- |
+| Framework     | Vue 3.5 (`<script setup>` + Composition)  |
+| Bundler       | Vite 6                                    |
+| Language      | TypeScript 5 (strict)                     |
+| State         | Pinia 2                                   |
+| Routing       | Vue Router 4 (with auth guard)            |
+| Styling       | Tailwind CSS 4 (CSS-first `@theme`)       |
+| HTTP          | axios                                     |
+| Drag & drop   | `vue-draggable-plus`                      |
+| Icons         | FontAwesome                               |
 
-- Node.js
-- npm (Node package manager)
+## Getting started
 
-## Installation
-
-1. Clone the repository:
+Make sure the [backend](../trello-back) is running first (default: `http://localhost:4000/api`).
 
 ```bash
-git clone https://github.com/Zo-ambinintsoa/trello-vue.git
+cp .env.example .env
+npm install
+npm run dev
 ```
 
-2. Navigate to the project directory:
+Open http://localhost:5173. Register a new account, create an organization (optional), then create projects and tasks.
 
-``` shell
- cd trello-clone
-  ```
+### Environment variables
 
-3. Install the package:
+| Variable        | Default                          |
+| --------------- | -------------------------------- |
+| `VITE_API_URL`  | `http://localhost:4000/api`      |
 
-``` shell
- npm install
-  ```
+### Scripts
 
-## usage 
+- `npm run dev` — start Vite dev server
+- `npm run build` — type-check + production build
+- `npm run preview` — preview the production build
+- `npm run type-check` — run `vue-tsc`
 
-To start the development server, run the following command: 
+## Project structure
 
+```
+src/
+├── components/       AppHeader, Modal, ConfirmDialog, BoardColumn, TaskCard, TaskModal
+├── router/           Vue Router with auth guard
+├── services/         api.ts (axios + token), auth, projects, organizations
+├── stores/           auth, projects, organizations (Pinia)
+├── types/            Shared TS types + enums (mirrors backend)
+├── views/
+│   ├── LoginView.vue
+│   ├── RegisterView.vue
+│   ├── ProjectsListView.vue
+│   ├── ProjectView.vue
+│   └── OrganizationsView.vue
+├── App.vue           Shell with AppHeader + `<router-view>`
+├── main.ts           Pinia + Router + FontAwesome bootstrap
+└── style.css         Tailwind v4 entry + brand theme tokens
+```
 
-``` shell
- npm run dev
-  ```
+## Architecture notes
 
+- **Auth flow.** On login/register, the JWT is stored in `localStorage` and installed as the default `Authorization` header on the axios instance. The router's `beforeEach` guard calls `auth.restore()` (idempotent) — which fetches `/auth/me` to verify the token and populate `user`. Any 401 anywhere in the app triggers an auto-logout + redirect to `/login`.
+- **Data model.** Types mirror the backend one-to-one (`Project`, `TaskStatus`, `Task`, `Organization`, `User`, `Importance` enum). The "columns" shown in the UI are `TaskStatus` records on the server.
+- **Optimistic mutations.** Updates go through Pinia actions that call the service, then update local state with the server response. Drag reorders fire `/tasks/reorder` and `/statuses/reorder` and reconcile from the response.
 
-This will start the development server and open the app in your default browser. You can access it at **http://localhost:5173**.
+## Not yet implemented on the frontend (backend ready)
 
-The app provides a Kanban board interface where you can create different columns and add tasks to each column. You can drag and drop tasks to move them between columns or reorder them within a column. Click on a task to edit its details, and use the delete button to remove a task.
+- Categories CRUD UI (per project)
+- Project members UI (invite / role change)
+- Organization members UI
+- Task assignment (`assignedUserId`) picker
 
-Feel free to customize the app by modifying the code in the src directory.
-
-
-## contributing
-<p> Contributions are welcome! If you have any suggestions, bug fixes, or new features to propose, please follow the steps below: </p>
-
-<ul>
-  <li>Fork the repository.</li>
-  <li>Create a new branch for your feature or bug fix.</li>
-  <li>Make your modifications.</li>
-  <li>Commit your changes and push to your forked repository.</li>
-  <li>Submit a pull request explaining your changes.</li>
-</ul>
-
-
-## Author
-
-<table class="table table-bordered table-striped">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Profession</th>
-      <th>LinkedIn Profile</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Ambinintsoa Mananjara Herizo</td>
-      <td>Full Stack Developer</td>
-      <td>
-        <a href="https://www.linkedin.com/in/zo-ambinintsoa/" target="_blank">LinkedIn Profile</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+The backend exposes all of these — they can be added without further API work.
