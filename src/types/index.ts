@@ -48,6 +48,47 @@ export enum NotificationType {
   INVITATION_PROJECT = 'invitation.project',
   INVITATION_ACCEPTED = 'invitation.accepted',
   INVITATION_DECLINED = 'invitation.declined',
+  TASK_ASSIGNED = 'task.assigned',
+  TASK_UNASSIGNED = 'task.unassigned',
+  TASK_MENTIONED = 'task.mentioned',
+  TASK_COMMENTED = 'task.commented',
+  TASK_DUE_CHANGED = 'task.due_changed',
+  TASK_STATUS_CHANGED = 'task.status_changed',
+  TASK_WATCHING = 'task.watching',
+}
+
+export enum TaskState {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  IN_REVIEW = 'IN_REVIEW',
+  BLOCKED = 'BLOCKED',
+  DONE = 'DONE',
+  ARCHIVED = 'ARCHIVED',
+}
+
+export enum TaskActivityType {
+  CREATED = 'created',
+  UPDATED = 'updated',
+  STATE_CHANGED = 'state_changed',
+  STATUS_CHANGED = 'status_changed',
+  PRIORITY_CHANGED = 'priority_changed',
+  DUE_DATE_CHANGED = 'due_date_changed',
+  ASSIGNEE_ADDED = 'assignee_added',
+  ASSIGNEE_REMOVED = 'assignee_removed',
+  WATCHER_ADDED = 'watcher_added',
+  WATCHER_REMOVED = 'watcher_removed',
+  TAG_ADDED = 'tag_added',
+  TAG_REMOVED = 'tag_removed',
+  COVER_CHANGED = 'cover_changed',
+  CHECKLIST_ADDED = 'checklist_added',
+  CHECKLIST_REMOVED = 'checklist_removed',
+  CHECKLIST_ITEM_ADDED = 'checklist_item_added',
+  CHECKLIST_ITEM_COMPLETED = 'checklist_item_completed',
+  CHECKLIST_ITEM_UNCOMPLETED = 'checklist_item_uncompleted',
+  CHECKLIST_ITEM_REMOVED = 'checklist_item_removed',
+  COMMENT_ADDED = 'comment_added',
+  COMMENT_EDITED = 'comment_edited',
+  COMMENT_REMOVED = 'comment_removed',
 }
 
 export interface Notification {
@@ -282,20 +323,103 @@ export interface ProjectMember {
   roleDef?: ProjectRoleDef | null
 }
 
+export interface TaskAssigneeLink {
+  id: string
+  taskId: string
+  userId: string
+  assignedAt: string
+  user?: User
+}
+
+export interface TaskWatcherLink {
+  id: string
+  taskId: string
+  userId: string
+  followedAt: string
+  user?: User
+}
+
+export interface TaskTagLink {
+  id: string
+  taskId: string
+  tagId: string
+  createdAt: string
+  tag?: Tag
+}
+
 export interface Task {
   id: string
   title: string
+  shortDescription: string | null
   description: string | null
+  longDescription: string | null
+  state: TaskState
+  startDate: string | null
   dueDate: string | null
+  estimatedCompletionDate: string | null
+  coverColor: string | null
+  coverImageUrl: string | null
   importance: Importance
   priorityId: string | null
+  priority?: Priority | null
   assignedUserId: string | null
+  assignedUser?: User | null
   projectId: string
   categoryId: string | null
   statusId: string | null
+  status?: TaskStatus | null
   position: number
   createdAt: string
   updatedAt: string
+  assignees?: TaskAssigneeLink[]
+  watchers?: TaskWatcherLink[]
+  taskTags?: TaskTagLink[]
+}
+
+export interface ChecklistItem {
+  id: string
+  checklistId: string
+  content: string
+  isCompleted: boolean
+  position: number
+  assignedUserId: string | null
+  dueDate: string | null
+  completedByUserId: string | null
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Checklist {
+  id: string
+  taskId: string
+  title: string
+  position: number
+  createdAt: string
+  updatedAt: string
+  items: ChecklistItem[]
+}
+
+export interface TaskComment {
+  id: string
+  taskId: string
+  userId: string
+  body: string
+  mentionedUserIds: string[] | null
+  editedAt: string | null
+  createdAt: string
+  updatedAt: string
+  user?: User
+}
+
+export interface TaskActivity {
+  id: string
+  taskId: string
+  userId: string | null
+  type: TaskActivityType
+  payload: Record<string, unknown> | null
+  createdAt: string
+  user?: User | null
 }
 
 export interface AuthResponse {

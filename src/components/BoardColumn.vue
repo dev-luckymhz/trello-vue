@@ -81,23 +81,22 @@ function openEditTask(task: Task) {
   taskModalOpen.value = true
 }
 
-async function onSaveTask(payload: {
-  title: string
-  description: string
-  dueDate: string | null
-  priorityId: string | null
-}) {
+async function onCreateTask(payload: Record<string, unknown>) {
   try {
-    if (taskBeingEdited.value) {
-      await store.updateTask(taskBeingEdited.value.id, payload)
-    } else {
-      await store.addTask(props.projectId, { ...payload, statusId: props.status.id })
-    }
+    await store.addTask(props.projectId, {
+      ...payload,
+      statusId: props.status.id,
+    } as Partial<Task>)
     taskModalOpen.value = false
     taskBeingEdited.value = null
   } catch (err) {
     error.value = extractErrorMessage(err)
   }
+}
+
+function onTaskUpdated(updated: Task) {
+  store.tasks = store.tasks.map((t) => (t.id === updated.id ? updated : t))
+  taskBeingEdited.value = updated
 }
 
 async function confirmDeleteTask() {
@@ -213,8 +212,10 @@ async function doDeleteColumn() {
       :open="taskModalOpen"
       :task="taskBeingEdited"
       :priorities="priorities"
+      :project-id="projectId"
       @close="taskModalOpen = false"
-      @save="onSaveTask"
+      @create="onCreateTask"
+      @updated="onTaskUpdated"
     />
 
     <ConfirmDialog
