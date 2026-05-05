@@ -91,37 +91,37 @@ const TOOLS: Array<{ icon: string; cmd: string; title: string; value?: string }>
     ]"
   >
     <div
-      class="flex items-center gap-0.5 px-2 py-1 bg-slate-50 dark:bg-slate-800/60 border-b divider flex-wrap"
+      class="flex items-center gap-0.5 px-1.5 py-1.5 bg-slate-100 dark:bg-slate-800 border-b divider flex-wrap"
     >
       <button
         v-for="tool in TOOLS"
         :key="tool.title"
         type="button"
-        class="w-7 h-7 rounded text-muted hover:text-app hover:bg-slate-200 dark:hover:bg-slate-700 inline-flex items-center justify-center text-xs"
+        class="w-8 h-8 rounded-md text-slate-700 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-300 hover:bg-white dark:hover:bg-slate-700 active:bg-brand-50 dark:active:bg-brand-900/30 inline-flex items-center justify-center transition disabled:opacity-40"
         :title="tool.title"
         :disabled="disabled"
         @mousedown.prevent="exec(tool.cmd, tool.value)"
       >
-        <font-awesome-icon :icon="tool.icon" class="w-3 h-3" />
+        <font-awesome-icon :icon="tool.icon" class="w-4 h-4" />
       </button>
-      <div class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+      <div class="w-px h-5 bg-slate-300 dark:bg-slate-600 mx-1"></div>
       <button
         type="button"
-        class="w-7 h-7 rounded text-muted hover:text-app hover:bg-slate-200 dark:hover:bg-slate-700 inline-flex items-center justify-center text-xs"
+        class="w-8 h-8 rounded-md text-slate-700 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-300 hover:bg-white dark:hover:bg-slate-700 inline-flex items-center justify-center transition disabled:opacity-40"
         title="Link"
         :disabled="disabled"
         @mousedown.prevent="onLinkClick"
       >
-        <font-awesome-icon icon="fa-solid fa-link" class="w-3 h-3" />
+        <font-awesome-icon icon="fa-solid fa-link" class="w-4 h-4" />
       </button>
       <button
         type="button"
-        class="w-7 h-7 rounded text-muted hover:text-app hover:bg-slate-200 dark:hover:bg-slate-700 inline-flex items-center justify-center text-xs"
+        class="w-8 h-8 rounded-md text-slate-700 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-300 hover:bg-white dark:hover:bg-slate-700 inline-flex items-center justify-center transition disabled:opacity-40"
         title="Clear formatting"
         :disabled="disabled"
         @mousedown.prevent="onClear"
       >
-        <font-awesome-icon icon="fa-solid fa-eraser" class="w-3 h-3" />
+        <font-awesome-icon icon="fa-solid fa-eraser" class="w-4 h-4" />
       </button>
     </div>
     <div

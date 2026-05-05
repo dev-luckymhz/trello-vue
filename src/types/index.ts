@@ -55,6 +55,53 @@ export enum NotificationType {
   TASK_DUE_CHANGED = 'task.due_changed',
   TASK_STATUS_CHANGED = 'task.status_changed',
   TASK_WATCHING = 'task.watching',
+  TASK_ATTACHMENT_ADDED = 'task.attachment_added',
+  TASK_DEPENDENCY_ADDED = 'task.dependency_added',
+  TASK_DEPENDENCY_RESOLVED = 'task.dependency_resolved',
+  TASK_TIME_LOGGED = 'task.time_logged',
+  TASK_RECURRENCE_FIRED = 'task.recurrence_fired',
+}
+
+export enum AttachmentKind {
+  FILE = 'file',
+  LINK = 'link',
+}
+
+export enum AttachmentProvider {
+  GENERIC = 'generic',
+  GOOGLE_DRIVE = 'google_drive',
+  DROPBOX = 'dropbox',
+  ONEDRIVE = 'onedrive',
+  GITHUB = 'github',
+  FIGMA = 'figma',
+  NOTION = 'notion',
+}
+
+export enum DependencyType {
+  BLOCKS = 'blocks',
+  DEPENDS_ON = 'depends_on',
+}
+
+export enum RecurrenceFrequency {
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum CustomFieldType {
+  TEXT = 'text',
+  NUMBER = 'number',
+  DATE = 'date',
+  SELECT = 'select',
+  MULTISELECT = 'multiselect',
+  CHECKBOX = 'checkbox',
+  URL = 'url',
+}
+
+export enum CustomFieldScope {
+  ORGANIZATION = 'organization',
+  PROJECT = 'project',
 }
 
 export enum TaskState {
@@ -89,6 +136,18 @@ export enum TaskActivityType {
   COMMENT_ADDED = 'comment_added',
   COMMENT_EDITED = 'comment_edited',
   COMMENT_REMOVED = 'comment_removed',
+  ATTACHMENT_ADDED = 'attachment_added',
+  ATTACHMENT_REMOVED = 'attachment_removed',
+  DEPENDENCY_ADDED = 'dependency_added',
+  DEPENDENCY_REMOVED = 'dependency_removed',
+  ESTIMATED_HOURS_CHANGED = 'estimated_hours_changed',
+  TIME_LOGGED = 'time_logged',
+  TIME_LOG_REMOVED = 'time_log_removed',
+  RECURRENCE_SET = 'recurrence_set',
+  RECURRENCE_REMOVED = 'recurrence_removed',
+  RECURRENCE_FIRED = 'recurrence_fired',
+  CUSTOM_FIELD_SET = 'custom_field_set',
+  CUSTOM_FIELD_CLEARED = 'custom_field_cleared',
 }
 
 export interface Notification {
@@ -359,6 +418,7 @@ export interface Task {
   estimatedCompletionDate: string | null
   coverColor: string | null
   coverImageUrl: string | null
+  estimatedHours: number | null
   importance: Importance
   priorityId: string | null
   priority?: Priority | null
@@ -374,6 +434,9 @@ export interface Task {
   assignees?: TaskAssigneeLink[]
   watchers?: TaskWatcherLink[]
   taskTags?: TaskTagLink[]
+  /** Annotated by list endpoints so cards can badge counts without extra calls. */
+  attachmentCount?: number
+  openBlockerCount?: number
 }
 
 export interface ChecklistItem {
@@ -420,6 +483,111 @@ export interface TaskActivity {
   payload: Record<string, unknown> | null
   createdAt: string
   user?: User | null
+}
+
+export interface TaskAttachment {
+  id: string
+  taskId: string
+  kind: AttachmentKind
+  provider: AttachmentProvider
+  name: string
+  url: string | null
+  storageKey: string | null
+  mimeType: string | null
+  sizeBytes: number | null
+  uploadedByUserId: string | null
+  createdAt: string
+  uploadedByUser?: User | null
+}
+
+export interface TaskDependencyView {
+  id: string
+  type: DependencyType
+  otherTaskId: string
+  otherTask: {
+    id: string
+    title: string
+    state: TaskState
+    statusId: string | null
+    dueDate: string | null
+  } | null
+  createdAt: string
+}
+
+export interface TimeLog {
+  id: string
+  taskId: string
+  userId: string
+  hours: number
+  loggedAt: string
+  note: string | null
+  createdAt: string
+  user?: User | null
+}
+
+export interface TimeSummary {
+  loggedHours: number
+  estimatedHours: number | null
+  remaining: number | null
+  entryCount: number
+}
+
+export interface TaskRecurrence {
+  id: string
+  taskId: string
+  frequency: RecurrenceFrequency
+  interval: number
+  byWeekday: number[] | null
+  monthDay: number | null
+  nextRunAt: string
+  lastRunAt: string | null
+  endDate: string | null
+  isActive: boolean
+  createdByUserId: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CustomFieldOption {
+  value: string
+  label: string
+  color?: string | null
+}
+
+export interface CustomFieldDefinition {
+  id: string
+  scope: CustomFieldScope
+  organizationId: string | null
+  projectId: string | null
+  key: string
+  label: string
+  type: CustomFieldType
+  options: CustomFieldOption[] | null
+  isRequired: boolean
+  position: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CustomFieldValue {
+  id: string
+  taskId: string
+  definitionId: string
+  value: unknown
+  createdAt: string
+  updatedAt: string
+  definition?: CustomFieldDefinition
+}
+
+export interface TaskProgressSnapshot {
+  percent: number
+  isDone: boolean
+  components: {
+    checklist: { done: number; total: number; pct: number } | null
+    dependencies: { resolved: number; total: number; pct: number } | null
+    time: { loggedHours: number; estimatedHours: number; pct: number } | null
+    state: { value: string; pct: number }
+  }
 }
 
 export interface AuthResponse {

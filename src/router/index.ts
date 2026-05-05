@@ -41,6 +41,13 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'projectTitleDynamic' },
   },
   {
+    path: '/projects/:projectId/tasks/:taskId',
+    name: 'task-detail',
+    component: () => import('@/views/TaskDetailView.vue'),
+    props: true,
+    meta: { titleKey: 'taskTitleDynamic' },
+  },
+  {
     path: '/organizations',
     name: 'organizations',
     component: () => import('@/views/OrganizationsView.vue'),
@@ -91,11 +98,17 @@ export function setDocumentTitle(pageTitle: string): void {
 router.afterEach((to) => {
   const t = i18n.global.t
   const key = to.meta.titleKey as string | undefined
-  if (!key || key === 'projectTitleDynamic' || key === 'organizationTitleDynamic') {
+  if (
+    !key ||
+    key === 'projectTitleDynamic' ||
+    key === 'organizationTitleDynamic' ||
+    key === 'taskTitleDynamic'
+  ) {
     // Dynamic routes set their own title via setDocumentTitle() once the
     // resource loads. Provide a sensible placeholder in the meantime.
     if (key === 'projectTitleDynamic') setDocumentTitle(t('projects.title'))
     else if (key === 'organizationTitleDynamic') setDocumentTitle(t('organizations.title'))
+    else if (key === 'taskTitleDynamic') setDocumentTitle(t('tasksTable.title'))
     else setDocumentTitle(t('app.name'))
     return
   }

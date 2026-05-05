@@ -67,7 +67,10 @@ function formatDate(iso: string | null): string {
 }
 
 function openTaskProject(task: AssignedTask) {
-  router.push({ name: 'project', params: { id: task.projectId } })
+  router.push({
+    name: 'task-detail',
+    params: { projectId: task.projectId, taskId: task.id },
+  })
 }
 
 function priorityStyle(task: AssignedTask) {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import type { Priority, Task } from '@/types'
 
 const props = defineProps<{
@@ -16,7 +17,16 @@ const emit = defineEmits<{
   (e: 'delete', taskId: string): void
 }>()
 
+const router = useRouter()
+
 const { t, locale } = useI18n()
+
+function openFullView(task: Task) {
+  router.push({
+    name: 'task-detail',
+    params: { projectId: task.projectId, taskId: task.id },
+  })
+}
 
 function formattedDate(date: string | null): string {
   if (!date) return ''
@@ -75,6 +85,8 @@ const assignees = computed(() => props.task.assignees ?? [])
 const tags = computed(() =>
   (props.task.taskTags ?? []).map((tt) => tt.tag).filter((tg): tg is NonNullable<typeof tg> => Boolean(tg)),
 )
+const attachmentCount = computed(() => props.task.attachmentCount ?? 0)
+const isBlocked = computed(() => (props.task.openBlockerCount ?? 0) > 0)
 </script>
 
 <template>
@@ -111,11 +123,27 @@ const tags = computed(() =>
       </div>
 
       <div class="flex items-start justify-between gap-2">
-        <p class="text-sm font-semibold text-app leading-snug">{{ task.title }}</p>
+        <div class="flex items-start gap-1.5 flex-1 min-w-0">
+          <span
+            v-if="isBlocked"
+            class="inline-flex items-center justify-center w-4 h-4 rounded bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 shrink-0 mt-0.5"
+            :title="t('taskModal.depsBlockedByThis')"
+          >
+            <font-awesome-icon icon="fa-solid fa-bolt" class="w-2 h-2" />
+          </span>
+          <p class="text-sm font-semibold text-app leading-snug">{{ task.title }}</p>
+        </div>
         <div
           v-if="canEdit || canDelete"
           class="flex items-center opacity-0 group-hover:opacity-100 transition shrink-0"
         >
+          <button
+            class="text-subtle hover:text-brand-600 dark:hover:text-brand-400 p-1 rounded"
+            @click.stop="openFullView(task)"
+            :aria-label="t('taskModal.openInPage')"
+          >
+            <font-awesome-icon icon="fa-solid fa-up-right-and-down-left-from-center" class="w-3 h-3" />
+          </button>
           <button
             v-if="canEdit"
             class="text-subtle hover:text-brand-600 dark:hover:text-brand-400 p-1 rounded"
@@ -157,6 +185,14 @@ const tags = computed(() =>
           >
             <font-awesome-icon icon="fa-solid fa-calendar-day" class="w-2.5 h-2.5" />
             {{ formattedDate(task.dueDate) }}
+          </span>
+          <span
+            v-if="attachmentCount > 0"
+            class="inline-flex items-center gap-1 text-[11px] text-subtle"
+            :title="t('taskModal.tabAttachments')"
+          >
+            <font-awesome-icon icon="fa-solid fa-paperclip" class="w-2.5 h-2.5" />
+            {{ attachmentCount }}
           </span>
         </div>
 
